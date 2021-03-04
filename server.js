@@ -32,7 +32,7 @@ app.set("views", "./views");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: false }));
 
-app.use(
+/*app.use(
   session({
     secret: "secret",
 
@@ -40,14 +40,14 @@ app.use(
 
     saveUninitialized: false,
   })
-);
+);*/
 //Static files
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static("public"));
 
 //This serves the static files from the React App
-app.use(express.static(path.join(_dirname, 'react-client/build')));
+app.use(express.static(path.join(_dirname, 'client/build')));
 //app.use("/css", express.static(__dirname + "public/css"));
 //app.use("/js", express.static(__dirname + "public/js"));
 //app.use("/images", express.static(__dirname + "public/images"));
@@ -80,10 +80,7 @@ app.get("/users/logout", (req, res) => {
 });*/
 
 
-//handles any request that do not match the ones above
-app.get('*', (req, res) =>{
-  res.sendFile(path.join(_dirname+'client/build/index.html'));
-})
+
 
 app.post("/users/register", async (req, res) => {
   let { name, email, password, password2 } = req.body;
@@ -153,14 +150,14 @@ app.post("/users/register", async (req, res) => {
 app.post(
   "/users/login",
   passport.authenticate("local", {
-    successRedirect: "/users/dashboard",
+    successRedirect: "/users/game",
     failureRedirect: "/users/login",
     failureFlash: true,
   })
 );
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
-    return res.redirect("/users/dashboard");
+    return res.redirect("/users/game");
   }
   next();
 }
@@ -171,6 +168,11 @@ function checkNotAuthenticated(req, res, next) {
   }
   res.redirect("/users/login");
 }
+
+//handles any request that do not match the ones above
+app.get('*', (req, res) =>{
+  res.sendFile(path.join(_dirname+'/client/build/index.html'));
+})
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
